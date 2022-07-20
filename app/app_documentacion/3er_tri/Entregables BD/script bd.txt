@@ -1,0 +1,134 @@
+CREATE DATABASE SAIA;
+
+USE SAIA;
+
+CREATE TABLE proveedores 
+(nit varchar (50) not null,
+nombre varchar (100) not null, 
+direccion varchar (80), 
+email varchar (100), 
+telefono varchar (50) 
+primary key (nit));
+
+CREATE TABLE Estados_del_producto (
+id int IDENTITY(1,1) not null,
+nombre varchar (100) not null, 
+primary key (id));
+
+CREATE TABLE Categorias (
+id int IDENTITY(1,1) not null, 
+nombre varchar (100) not null, 
+primary key (id));
+
+CREATE TABLE Facturas_de_compra (
+numero varchar (15) not null, 
+fecha date not null,
+factura image not null,
+valor float (50) not null,
+nit_pro varchar (50) not null, 
+primary key (numero),
+foreign key (nit_pro) references proveedores (nit));
+
+CREATE TABLE Roles (
+id int IDENTITY(1,1) not null, 
+nombre varchar (25) not null, 
+primary key (id));
+
+CREATE TABLE Clientes (
+documento varchar (30) not null, 
+apellidos varchar (100) not null,
+nombres varchar (100) not null,
+email varchar (150),
+direccion varchar (80),
+telefono varchar (50),
+primary key (documento));
+
+CREATE TABLE Facturas_de_venta (
+numero varchar (25) not null,
+fecha_creacion date not null,
+fecha_expedicion date not null,
+valor_bruto float (30) not null,
+iva float (20) not null,
+valor_neto float (30) not null,
+doc_cli varchar (30) not null,
+primary key (numero),
+foreign key (doc_cli) references clientes (documento));
+
+CREATE TABLE vehiculos (
+placa varchar (15) not null,
+marca varchar (25) not null,
+modelo varchar (50) not null,
+tipo varchar (50) not null,
+doc_cli varchar (30) not null,
+primary key (placa),
+foreign key (doc_cli) references clientes (documento)
+);
+
+CREATE TABLE usuarios (
+documento varchar (30) not null,
+apellidos varchar (150) not null,
+nombres varchar (150) not null,
+email varchar (80) unique not null,
+contraseña varchar (15) not null,
+telefono varchar (25),
+id_rol int  not null,
+primary key (documento),
+foreign key (id_rol) references roles (id)
+);
+
+CREATE TABLE Ordenes_de_servicio (
+id int IDENTITY(1,1) not null,
+fecha_entrada date not null,
+fecha_salida date null,
+diagnostico_tecnico varchar (250) not null,
+doc_usu varchar (30) not null,
+pla_veh varchar (15) not null,
+primary key (id),
+foreign key (doc_usu) references usuarios (documento),
+foreign key (pla_veh) references vehiculos (placa)
+);
+
+CREATE TABLE Descripciones (
+id int IDENTITY(1,1) not null,
+fecha datetime DEFAULT CURRENT_TIMESTAMP not null,
+descripcion varchar (750) not null,
+id_ord_ser int not null,
+primary key (id),
+foreign key (id_ord_ser) references ordenes_de_servicio (id)
+);
+
+CREATE TABLE servicios (
+id int IDENTITY(1,1) not null,
+nombre varchar (80) not null,
+id_ord_ser int not null,
+primary key (id),
+foreign key (id_ord_ser) references ordenes_de_servicio (id)
+);
+
+CREATE TABLE documentos_de_contrato (
+id int IDENTITY(1,1) not null,
+nombre varchar (100) not null,
+documento image not null,
+fecha datetime DEFAULT CURRENT_TIMESTAMP not null,
+doc_usu varchar (30),
+primary key (id),
+foreign key (doc_usu) references usuarios (documento)
+);
+
+CREATE TABLE productos (
+codigo varchar (25) not null,
+nombre varchar (100) not null,
+marca varchar (100),
+referencia varchar (50) not null,
+tipo varchar (80),
+num_fac varchar (15) not null,
+id_est_pro int not null,
+id_cat int not null,
+doc_usu varchar (30) not null,
+primary key (codigo),
+foreign key (num_fac) references facturas_de_compra (numero),
+foreign key (id_est_pro) references Estados_del_producto (id),
+foreign key (id_cat) references categorias (id),
+foreign key (doc_usu) references usuarios (documento)
+
+);
